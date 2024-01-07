@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from flask_cors import CORS
 
 import os
@@ -162,6 +162,7 @@ def recognize_faces_in_video(video_path, model_path, output_folder, output_faces
         # Liberar los recursos
         cap.release()
         out.release()
+        print("DEvuelve videoooo")
     except Exception as e:
         print(f"¡Error! recognize_faces_in_video: {e}")
         
@@ -257,13 +258,18 @@ def train_model():
 
 @app.route('/api/recognize_video', methods=['POST'])
 def recognize_video():
-    print("revognice")
+    print("recognice")
     try:
         # Obtener el video enviado desde el front-end
+        
+        print("---------------")
+        print(request.files['video'])
+        print("---------------")
         video_file = request.files['video']
         
         # Crear una ruta temporal para el video
         temp_video_path = 'temp_video.mp4'
+        print("PAth: " + temp_video_path)
         video_file.save(temp_video_path)
 
         # Llamar a la función para reconocer caras en el video
@@ -272,6 +278,7 @@ def recognize_video():
         # Devolver el video procesado al front-end
         return send_file('output_folder/output_video.mp4', as_attachment=True)
     except Exception as e:
+        print(str(e))
         return jsonify({'error': str(e)}), 500
 
 @app.route('/realtime_recognition', methods=['GET'])
