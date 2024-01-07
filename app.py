@@ -257,16 +257,20 @@ def train_model():
 
 @app.route('/api/recognize_video', methods=['POST'])
 def recognize_video():
+    print("revognice")
     try:
-        video_path = request.form['video_path']
-        model_path = 'modeloEigenFaceRecognizer.xml'
-        output_folder = 'output_folder'
-        output_faces_folder = 'output_faces_folder'
+        # Obtener el video enviado desde el front-end
+        video_file = request.files['video']
+        
+        # Crear una ruta temporal para el video
+        temp_video_path = 'temp_video.mp4'
+        video_file.save(temp_video_path)
 
-        # Llama a la función para reconocer caras en el video
-        recognize_faces_in_video(video_path, model_path, output_folder, output_faces_folder)
+        # Llamar a la función para reconocer caras en el video
+        recognize_faces_in_video(temp_video_path, 'modeloEigenFaceRecognizer.xml', 'output_folder', 'output_faces_folder')
 
-        return jsonify({'message': 'Video recognized successfully'})
+        # Devolver el video procesado al front-end
+        return send_file('output_folder/output_video.mp4', as_attachment=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
