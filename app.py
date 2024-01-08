@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, Response
 from flask_cors import CORS
 
 
@@ -237,12 +237,30 @@ def recognize_faces_realtime(model_path, output_faces_folder):
 # Uso de la función en tiempo real
 #recognize_faces_realtime('modeloEigenFaceRecognizer.xml', 'output_faces_folder')
 
-
-
-
-@app.route('/')
+import cv2
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+face_detector = cv2.CascadeClassifier(cv2.data.haarcascades +
+     "haarcascade_frontalface_default.xml")
+def generate():
+     while True:
+          ret, frame = cap.read()
+          if ret:
+               gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+               faces = face_detector.detectMultiScale(gray, 1.3, 5)
+               for (x, y, w, h) in faces:
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+               (flag, encodedImage) = cv2.imencode(".jpg", frame)
+               if not flag:
+                    continue
+               yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
+                    bytearray(encodedImage) + b'\r\n')
+@app.route("/")
 def index():
-    return render_template('index.html')
+     return render_template("index.html")
+@app.route("/video_feed")
+def video_feed():
+     return Response(generate(),
+          mimetype = "multipart/x-mixed-replace; boundary=frame")
 
 @app.route('/api/train_model', methods=['POST'])
 def train_model():
@@ -294,6 +312,7 @@ def realtime_recognition():
         return jsonify({'success': True, 'message': 'Real-time recognition started successfully.'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
