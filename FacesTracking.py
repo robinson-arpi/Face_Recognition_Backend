@@ -218,7 +218,7 @@ def recognize_faces_realtime(model_path, output_faces_folder):
 
 # Uso de la función con un máximo de 30 capturas
 #extract_faces_from_video('Lit Killah.mp4', 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
-extract_faces_from_video('Robinson Arpi.mp4', 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
+extract_faces_from_video('Kevin Juela.mp4', 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
 
 # entrenamiento
 train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')
