@@ -1,0 +1,39 @@
+/* Definición de variables de colores */
+:root {
+    --color-primario: #0d0c1d;
+    --color-secundario: #f1dac4;
+    --color-terciario: #161b33;
+
+  }
+body{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.navbar-styles{
+    background: var(--color-primario) !important;
+    border:none;
+}
+
+.card-hover:hover {
+    box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
+    transition: box-shadow 0.3s ease; /* Agrega una transición para suavizar el efecto */
+    background-color: #f0f0f0; /* Cambia el color de fondo al hacer hover */
+  }
+
+  footer {
+    text-align: center;
+}
+
+u {
+    color: var(--color-primario); /* Color de la barra baja */
+}
+
+.content {
+  flex: 1;
+  height: 80vh;  /* Establecer la altura del cuerpo como el 80% del viewport height */
+}
