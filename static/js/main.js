@@ -22,6 +22,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
     realtimeCard.addEventListener('click', function () {
         redirectToPage('realtime');
-        
     });
 });

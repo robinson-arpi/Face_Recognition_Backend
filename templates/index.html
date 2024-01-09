@@ -1,35 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Videostreaming</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-        <!-- Enlace a tu archivo de estilo CSS -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 
-</head>
+{% extends 'base.html' %}
 
-<body>
-<nav class="navbar-default">
-    
-        <div class="navbar-header navbar-default">
-            <div class="d-flex align-items-center"> <!-- Agrega una clase para alinear elementos verticalmente -->
-                <img src="{{ url_for('static', filename='favicon.ico') }}" alt="Train Icon" style="width: 40px; height: 40px;">
-                <a class="navbar-brand" href="#"><h1>Face recognition</h1></a>
-            </div>
-        </div>
-    
-</nav>
+{% block content %}
 <div class="container-fluid pt-2 content">
     <div class="row">
         <div class="col-sm-12 col-md-4">
             <div class="card card-hover mb-3"  id="trainingCard" style="cursor: pointer;">
                 <img src="{{ url_for('static', filename='assets/images/train.ico') }}" alt="Train Icon" class="card-img-top mx-auto d-block" style="width: 100px; height: 100px;">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Capture or Training Video Upload</h5>
+                    <h4 class="card-title">Capture or Training Video Upload</h4>
                     <p class="card-text">
                         Capture a video to train the model and enable facial recognition.
                     </p>
@@ -40,7 +19,7 @@
             <div class="card card-hover mb-3"  id="uploadCard" style="cursor: pointer;">
                 <img src="{{ url_for('static', filename='assets/images/upload.ico') }}" alt="Cloud Icon" class="card-img-top mx-auto d-block" style="width: 100px; height: 100px;">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Facial Recognition on Uploaded Videos</h5>
+                    <h4 class="card-title">Facial Recognition on Uploaded Videos</h4>
                     <p class="card-text">
                         Upload a video to perform facial recognition on previously trained faces.
                     </p>
@@ -52,7 +31,7 @@
             <div class="card card-hover mb-3"  id="realtimeCard" style="cursor: pointer;">
                 <img src="{{ url_for('static', filename='assets/images/webcam.ico') }}" alt="Webcam Icon" class="card-img-top mx-auto d-block" style="width: 100px; height: 100px;">
                 <div class="card-body text-center">
-                    <h5 class="card-title">Real-Time Facial Recognition from Webcam</h5>
+                    <h4 class="card-title">Real-Time Facial Recognition from Webcam</h4>
                     <p class="card-text">
                         Capture video from your webcam and observe real-time facial recognition.
                     </p>
@@ -61,12 +40,4 @@
         </div>
     </div>
 </div> 
-
-<footer class="mt-auto">
-    <p class="text-center">Made with ❤️ by Merge Conflict</p>
-</footer>
-<!-- Enlace a tu archivo JavaScript -->
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>  
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <form action="/training" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="videoFile" class="form-label">Select Video (.mp4)</label>
+            <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4" required>
+            <div class="invalid-feedback">
+                Please choose a valid .mp4 file.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Upload Video and Train</button>
+    </form>
+
+    {% if message %}
+        <div class="mt-3 alert alert-{{ 'success' if success else 'danger' }}" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

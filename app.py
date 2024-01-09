@@ -275,7 +275,7 @@ def train_model():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/recognize_video', methods=['POST'])
+@app.route('/recognize_video', methods=['POST'])
 def recognize_video():
     print("recognice")
     try:
