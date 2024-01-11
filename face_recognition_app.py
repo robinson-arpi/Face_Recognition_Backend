@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, request, jsonify, send_file
+from moviepy.editor import VideoFileClip
 import cv2
 import os
 import numpy as np
@@ -8,8 +9,6 @@ cap = None
 face_detector = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 face_recognizer = cv2.face.EigenFaceRecognizer_create()
 face_recognizer.read("modeloEigenFaceRecognizer.xml")
-
-
 
 def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=50):
     try:
@@ -25,7 +24,6 @@ def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_c
 
         count = 0
         while count < max_captures:
-            print(count)
             ret, frame = video_capture.read()
             if not ret:
                 break
@@ -43,24 +41,21 @@ def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_c
                 break
 
         video_capture.release()
+        return video_name
     except Exception as e:
         print(f"¡Error! extract_faces_from_video: {e}")
 
 def train_face_recognizer(data_path, model_path='modeloEigenFaceRecognizer.xml'):
     try:
         people_list = os.listdir(data_path)
-        #print('Lista de personas: ', people_list)
-
+        
         labels = []
         faces_data = []
         label = 0
 
         for name_dir in people_list:
             person_path = os.path.join(data_path, name_dir)
-            print('Leyendo las imágenes')
-
             for file_name in os.listdir(person_path):
-                print('Rostros: ', name_dir + '/' + file_name)
                 labels.append(label)
                 face = cv2.imread(os.path.join(person_path, file_name), 0)
                 faces_data.append(face)
@@ -73,7 +68,6 @@ def train_face_recognizer(data_path, model_path='modeloEigenFaceRecognizer.xml')
         # Crear el reconocedor de rostros
         face_recognizer = cv2.face.EigenFaceRecognizer_create()
 
-        print("Entrenando...")
         face_recognizer.train(faces_data_resized, np.array(labels))
         face_recognizer.write(model_path)
         print("Modelo almacenado en", model_path)
@@ -93,9 +87,6 @@ def create_labels_mapping(data_path):
     try:
         people_list = os.listdir(data_path)
         labels_mapping = {label: person_name for label, person_name in enumerate(people_list)}
-        print('labels')
-        print(labels_mapping)
-        print("--------------")
         return labels_mapping
     except Exception as e:
         print(f"¡Error! create_labels_mapping: {e}")
@@ -165,7 +156,6 @@ def recognize_faces_in_video(video_path, model_path, output_folder, output_faces
         # Liberar los recursos
         cap.release()
         out.release()
-        print("DEvuelve videoooo")
     except Exception as e:        
         print(f"¡Error! recognize_faces_in_video: {e}")
 
@@ -208,11 +198,11 @@ def generate(labels_mapping):
                bytearray(encodedImage) + b'\r\n')
 
     # Liberar la cámara cuando el generador termina
-    if cap is not None:
-        cap.release()
+    cap.release()
 
 @app.route("/")
 def index():
+    cap.release()
     return render_template("index.html")
 
 @app.route("/video_feed")
@@ -243,25 +233,45 @@ def training():
             if 'videoFile' not in request.files:
                 return jsonify({'error': 'No se envió ningún archivo de video'}), 400
 
-            video_file = request.files['videoFile']
+            video_file = None
+            temp_video_path = ""
+            try:
+                video_name = request.form.get('videoName')
+                video_file = request.files['videoFile']
 
-            # Verificar si el archivo tiene una extensión válida
-            if video_file.filename == '' or not video_file.filename.endswith('.mp4'):
-                return jsonify({'error': 'El archivo no es un video válido (.mp4)'}), 400
+                # Guarda el video webm temporalmente
+                temp_path = f'temporal\\temp_{video_name}.webm'
+                video_file.save(temp_path)
+                # Convierte el video webm a mp4
+                temp_video_path = 'training_videos\\' + video_name + '.mp4'
+                print(temp_video_path)
+                try:
+                    clip = VideoFileClip(temp_path)
+                    clip.write_videofile(temp_video_path, codec='libx264')
+                    clip.close()
+                    print("webcam")
+                except Exception as e:
+                    print(e)    
+            except Exception as e:
+                print("Entra a upload")
+                video_file = request.files['videoFile']
+                video_name = video_file.filename
+                # Guardar el archivo de video en una ruta temporal
+                temp_video_path = 'training_videos\\' + video_name
+                video_file.save(temp_video_path)
+                print("upload")
 
-            # Guardar el archivo de video en una ruta temporal
-            temp_video_path = 'temp_video_training.mp4'
-            video_file.save(temp_video_path)
+
 
             # Llamar a la función para reconocer caras en el video  
-            extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
+            new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
 
             # entrenamiento
             train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')
 
-
-            return render_template('training.html', message='Nuevo rostro agregado exitosamente', success=True)
+            return render_template('training.html', message='Agregado(a): ' + new_face, success=True)
         except Exception as e:
+            print(e)
             return render_template('training.html', message=str(e), success=False)
 
     return render_template('training.html')
@@ -295,4 +305,4 @@ def upload_video():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)

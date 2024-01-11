@@ -4,8 +4,14 @@
 <div class="container mt-5">
     <form action="/training" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         <div class="mb-3">
-            <label for="videoFile" class="form-label">Select Video (.mp4)</label>
-            <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4" required>
+            <label for="videoFile" class="form-label">Select Video (.mp4) or Record from Webcam</label>
+            <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4">
+            <small class="text-muted">OR</small>
+            <button type="button" class="btn btn-secondary" id="recordButton">Record from Webcam</button>
+            <video id="recordedVideo" style="display: none;" controls></video>
+            <input type="hidden" id="webcamVideo" name="webcamVideo">
+            <input type="text" class="form-control mt-2" id="videoName" name="videoName" placeholder="Enter video name (Optional)">
+            <button type="button" class="btn btn-danger mt-2" id="stopRecordButton" style="display: none;">Stop Recording</button>
             <div class="invalid-feedback">
                 Please choose a valid .mp4 file.
             </div>
@@ -20,5 +26,51 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const recordButton = document.getElementById('recordButton');
+    const stopRecordButton = document.getElementById('stopRecordButton');
+    const recordedVideo = document.getElementById('recordedVideo');
+    const webcamVideoInput = document.getElementById('webcamVideo');
+    const videoNameInput = document.getElementById('videoName');
+    let mediaRecorder;
+    let chunks = [];
+
+    recordButton.addEventListener('click', startRecording);
+    stopRecordButton.addEventListener('click', stopRecording);
+
+    async function startRecording() {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                chunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            recordedVideo.src = url;
+            recordedVideo.style.display = 'block';
+            webcamVideoInput.value = url;
+        };
+
+        mediaRecorder.start();
+        chunks = [];
+
+        recordButton.style.display = 'none';
+        stopRecordButton.style.display = 'block';
+    }
+
+    function stopRecording() {
+        mediaRecorder.stop();
+        recordButton.style.display = 'block';
+        stopRecordButton.style.display = 'none';
+    }
+});
+</script>
 
 {% endblock %}
