@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 app = Flask(__name__)
-cap = None
+cap = cv2.VideoCapture(0)
 face_detector = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 face_recognizer = cv2.face.EigenFaceRecognizer_create()
 face_recognizer.read("modeloEigenFaceRecognizer.xml")
@@ -202,6 +202,7 @@ def generate(labels_mapping):
 
 @app.route("/")
 def index():
+    global cap
     cap.release()
     return render_template("index.html")
 

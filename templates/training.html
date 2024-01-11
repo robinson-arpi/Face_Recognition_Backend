@@ -3,21 +3,38 @@
 {% block content %}
 <div class="container mt-5">
     <form action="/training" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-        <div class="mb-3">
-            <label for="videoFile" class="form-label">Select Video (.mp4) or Record from Webcam</label>
-            <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4">
-            <small class="text-muted">OR</small>
-            <button type="button" class="btn btn-secondary" id="recordButton">Record from Webcam</button>
-            <video id="recordedVideo" style="display: none;" controls></video>
-            <input type="hidden" id="webcamVideo" name="webcamVideo">
-            <input type="text" class="form-control mt-2" id="videoName" name="videoName" placeholder="Enter video name (Optional)">
-            <button type="button" class="btn btn-danger mt-2" id="stopRecordButton" style="display: none;">Stop Recording</button>
-            <div class="invalid-feedback">
-                Please choose a valid .mp4 file.
+        <label for="videoFile" class="form-label">Select Video (.mp4) or Record from Webcam</label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3 card-custom">
+                    <div class="card-body">
+                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4">
+                        <div class="invalid-feedback">
+                            Please choose a valid .mp4 file.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-3 card-custom">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-secondary" id="recordButton">Record from Webcam</button>
+                        <video id="recordedVideo" style="display: none;" controls></video>
+                        <input type="hidden" id="webcamVideo" name="webcamVideo">
+                        <input type="text" class="form-control mt-2" id="videoName" name="videoName" placeholder="Enter a name for person">
+                        <button type="button" class="btn btn-danger mt-2" id="stopRecordButton" style="display: none;">Stop Recording</button>
+        
+                    </div>
+                </div>
             </div>
         </div>
-
-        <button type="submit" class="btn btn-primary">Upload Video and Train</button>
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary button-custom">Upload Video and Train</button>
+            </div>
+        </div>
+          
     </form>
 
     {% if message %}

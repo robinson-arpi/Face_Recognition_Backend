@@ -28,6 +28,16 @@ h5 {
   background-color: #f0f0f0; /* Cambia el color de fondo al hacer hover */
 }
 
+.card-custom {
+  height: 20vh;
+}
+
+.card-custom:hover {
+  box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
+  transition: box-shadow 0.3s ease; /* Agrega una transición para suavizar el efecto */
+  background-color: #f0f0f0; /* Cambia el color de fondo al hacer hover */
+}
+
 footer {
   background-color: var(--color-terciario);
   height: 5vh;
@@ -44,4 +54,16 @@ footer {
   background: var(--color-primario) !important;
   color: var(--color-secundario) !important; /* Cambia este valor al color del texto que desees */
   height: 10vh;
+}
+
+.button-custom{
+  background: var(--color-primario) !important;
+  border-color: var(--color-primario) !important; /* Change this to the desired shade of blue */
+
+}
+
+.button-custom:hover{
+  background: var(--color-terciario) !important;
+  border-color: var(--color-primario) !important; /* Change this to the desired shade of blue */
+  box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
 }

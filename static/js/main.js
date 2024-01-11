@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const trainingCard = document.getElementById('trainingCard');
     const uploadCard = document.getElementById('uploadCard');
     const realtimeCard = document.getElementById('realtimeCard');
+    const home = document.getElementById('home');
 
     // Función para redirigir a la página especificada
     function redirectToPage(page) {
@@ -12,6 +13,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Agregar manejadores de eventos de clic a los cards
+    home.addEventListener('click', function () {
+        redirectToPage('');
+    });
+
     trainingCard.addEventListener('click', function () {
         redirectToPage('training');
     });

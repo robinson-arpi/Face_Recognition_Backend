@@ -3,15 +3,24 @@
 {% block content %}
 <div class="container mt-5">
     <form action="/upload_video" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-        <div class="mb-3">
-            <label for="videoFile" class="form-label">Select Video (.mp4)</label>
-            <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4" required>
-            <div class="invalid-feedback">
-                Please choose a valid .mp4 file.
+        <div class="row">
+            <div class="mb-3">
+                <div class="card mb-3 card-custom">
+                    <div class="card-body">
+                        <label for="videoFile" class="form-label">Select Video (.mp4)</label>
+                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4" required>
+                        <div class="invalid-feedback">
+                            Please choose a valid .mp4 file.
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Upload Video</button>
+        </div>    
+        <div class="row">
+            <div class="col-12 d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary button-custom">Upload Video</button>
+            </div>
+        </div>    
     </form>
 
     {% if video_url %}
