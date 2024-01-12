@@ -3,13 +3,80 @@ from moviepy.editor import VideoFileClip
 import cv2
 import os
 import numpy as np
-from person_recognition import person_recognition_HOG, person_recognition_TRACK
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
+video = cv2.VideoCapture(0)     #Variable para person_recognition
+
 face_detector = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 face_recognizer = cv2.face.EigenFaceRecognizer_create()
 face_recognizer.read("modeloEigenFaceRecognizer.xml")
+
+# Carga de el modelo preentrenado de Yolov3
+configuracion = "model/yolov3.cfg"
+pesos_red = "model/yolov3.weights"
+etiquetas = open("model/coco.names").read().split("\n")
+
+# Colores para los rectángulos
+colores = np.random.randint(0, 255, size=(len(etiquetas), 3), dtype="uint8")
+
+# Creación del modelo de red 
+red_yolo = cv2.dnn.readNetFromDarknet(configuracion, pesos_red)
+
+def person_recognition_model():
+    global video
+    video = cv2.VideoCapture(0)
+    while True:
+        ret, frame = video.read()
+        if not ret:
+            break
+        # Dimensiones del frame
+        height, width, _ = frame.shape
+
+        desc = cv2.dnn.blobFromImage(frame, 1 / 255.0, (416, 416), swapRB=True, crop=False)
+
+        lan = red_yolo.getLayerNames()
+        lan = [lan[i - 1] for i in red_yolo.getUnconnectedOutLayers()]
+        red_yolo.setInput(desc)
+        salidas_red = red_yolo.forward(lan)
+
+        cajas = []
+        confi = []
+        class_IDs = []
+        for output in salidas_red:
+            for detection in output:
+                scores = detection[5:]
+                classID = np.argmax(scores)
+                confidence = scores[classID]
+                if confidence > 0.7 and classID == 0:
+                    box = detection[:4] * np.array([width, height, width, height])
+                    #print("box:", box)
+                    (x_center, y_center, w, h) = box.astype("int")
+                    #print((x_center, y_center, w, h))
+                    x = int(x_center - (w / 2))
+                    y = int(y_center - (h / 2))
+                    #cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    cajas.append([x, y, w, h])
+                    confi.append(float(confidence))
+                    class_IDs.append(classID)
+        if classID == 0:
+            idx = cv2.dnn.NMSBoxes(cajas, confi, 0.5, 0.5)
+            if len(idx) > 0:
+                for i in idx:
+                    (x, y) = (cajas[i][0], cajas[i][1])
+                    (w, h) = (cajas[i][2], cajas[i][3])
+                    color = colores[class_IDs[i]].tolist()
+                    # text = "{}: {:.3f}".format(etiquetas[classIDs[i]], confidences[i])
+                    text = "{}: {:.3f}".format('Persona', confi[i])
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(frame, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                                    0.5, color, 2)
+        (flag, encodedImage) = cv2.imencode(".jpg", frame)
+        if not flag:
+            continue
+        yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' +
+                bytearray(encodedImage) + b'\r\n')
+    video.release()
 
 def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=50):
     try:
@@ -204,7 +271,9 @@ def generate(labels_mapping):
 @app.route("/")
 def index():
     global cap
+    global video
     cap.release()
+    video.release()
     return render_template("index.html")
 
 @app.route("/video_feed")
@@ -214,9 +283,7 @@ def video_feed():
 
 @app.route("/video_feed_person")
 def video_feed_person():
-    # return Response(person_recognition_HOG(), mimetype="multipart/x-mixed-replace; boundary=frame")
-    # Activar para probar el reconocimiento con el tracking de movimiento
-    return Response(person_recognition_TRACK(), mimetype="multipart/x-mixed-replace; boundary=frame")
+    return Response(person_recognition_model(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 @app.route("/upload")
