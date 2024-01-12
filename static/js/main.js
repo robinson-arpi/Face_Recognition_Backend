@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const trainingCard = document.getElementById('trainingCard');
     const uploadCard = document.getElementById('uploadCard');
     const realtimeCard = document.getElementById('realtimeCard');
+    const personRealtimeCard = document.getElementById('personRealtimeCard');
     const home = document.getElementById('home');
 
     // Función para redirigir a la página especificada
@@ -27,5 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     realtimeCard.addEventListener('click', function () {
         redirectToPage('realtime');
+    });
+
+    personRealtimeCard.addEventListener('click', function () {
+        redirectToPage('realtime_person');
     });
 });

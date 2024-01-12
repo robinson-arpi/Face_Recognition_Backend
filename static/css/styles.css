@@ -47,8 +47,13 @@ footer {
 .content {
   flex: 1; /* Hacer que el contenedor principal ocupe todo el espacio disponible */
   height: 85vh;  /* Establecer la altura del cuerpo como el 80% del viewport height */
+  justify-content: center;
+  align-items: center;
 }
 
+.row {
+  justify-content: center;
+}
 /* Estilos para la barra de navegación */
 .navbar-custom {
   background: var(--color-primario) !important;

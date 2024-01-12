@@ -3,6 +3,7 @@ from moviepy.editor import VideoFileClip
 import cv2
 import os
 import numpy as np
+from person_recognition import person_recognition_HOG, person_recognition_TRACK
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
@@ -211,6 +212,11 @@ def video_feed():
     labels_mapping = create_labels_mapping("output_faces_folder")
     return Response(generate(labels_mapping), mimetype="multipart/x-mixed-replace; boundary=frame")
 
+@app.route("/video_feed_person")
+def video_feed_person():
+    return Response(person_recognition_HOG(), mimetype="multipart/x-mixed-replace; boundary=frame")
+    # Activar para probar el reconocimiento con el tracking de movimiento
+    # return Response(person_recognition_HOG(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 @app.route("/upload")
@@ -223,8 +229,10 @@ def realtime():
     # Agrega la lógica que deseas ejecutar para la página en tiempo real
     return render_template("realtime.html")
 
-
-
+@app.route("/realtime_person")
+def realtime_person():
+    # Agrega la lógica que deseas ejecutar para la página en tiempo real
+    return render_template("personRealTime.html")
 
 @app.route('/training', methods=['GET', 'POST'])
 def training():
