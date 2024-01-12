@@ -214,9 +214,9 @@ def video_feed():
 
 @app.route("/video_feed_person")
 def video_feed_person():
-    return Response(person_recognition_HOG(), mimetype="multipart/x-mixed-replace; boundary=frame")
-    # Activar para probar el reconocimiento con el tracking de movimiento
     # return Response(person_recognition_HOG(), mimetype="multipart/x-mixed-replace; boundary=frame")
+    # Activar para probar el reconocimiento con el tracking de movimiento
+    return Response(person_recognition_TRACK(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
 @app.route("/upload")
