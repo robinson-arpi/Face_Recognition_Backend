@@ -1,8 +1,8 @@
 import cv2
 import os
 import numpy as np
-import imutils
-from imutils import non_max_suppression
+#import imutils
+#from imutils import non_max_suppression
 
 def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=50):
     try:
@@ -18,7 +18,7 @@ def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_c
 
         count = 0
         while count < max_captures:
-            print(count)
+            #print(count)
             ret, frame = video_capture.read()
             if not ret:
                 break
@@ -220,7 +220,7 @@ def recognize_faces_realtime(model_path, output_faces_folder):
 
 # Uso de la función con un máximo de 30 capturas
 #extract_faces_from_video('Lit Killah.mp4', 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
-#extract_faces_from_video('Kevin Juela.mp4', 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
+#extract_faces_from_video('training_videos\\Robinson Arpi.mp4', 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
 
 # entrenamiento
 train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')

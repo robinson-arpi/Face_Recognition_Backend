@@ -21,10 +21,9 @@
                     <div class="card-body">
                         <button type="button" class="btn btn-secondary" id="recordButton">Record from Webcam</button>
                         <video id="recordedVideo" style="display: none;" controls></video>
-                        <input type="hidden" id="webcamVideo" name="webcamVideo">
+                        <input type="file" class="form-control mt-2" id="webcamVideo" name="webcamVideo" accept="video/*" style="display: none;">
                         <input type="text" class="form-control mt-2" id="videoName" name="videoName" placeholder="Enter a name for person">
                         <button type="button" class="btn btn-danger mt-2" id="stopRecordButton" style="display: none;">Stop Recording</button>
-        
                     </div>
                 </div>
             </div>
@@ -67,13 +66,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
 
+        
+
+        function createFileList(file) {
+            const fileList = new DataTransfer();
+            fileList.items.add(file);
+            return fileList.files;
+        }
+
         mediaRecorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            recordedVideo.src = url;
-            recordedVideo.style.display = 'block';
-            webcamVideoInput.value = url;
+            alert("Stop");
+            try {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                recordedVideo.src = url;
+
+                // Utiliza la función createFileList para asignar el FileList al atributo files del input
+                webcamVideoInput.files = createFileList(new File([blob], 'webcam-video.mp4', { type: 'video/mp4' }));
+
+                alert(`Blob size: ${blob.size}`);
+            } catch (error) {
+                alert(error);
+            }
         };
+        
 
         mediaRecorder.start();
         chunks = [];

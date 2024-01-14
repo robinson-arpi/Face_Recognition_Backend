@@ -312,6 +312,14 @@ def realtime_person():
 def training():
     if request.method == 'POST':
         try:
+            print("antes d eif")
+            if 'webcamVideo' in request.files:
+                print("En if")
+                file = request.files['webcamVideo']
+                file.save("Leggooo.webm")
+                return "Video subido con éxito."
+                
+            return "Error al subir el video."
             # Verificar si se ha enviado un archivo
             if 'videoFile' not in request.files:
                 return jsonify({'error': 'No se envió ningún archivo de video'}), 400
