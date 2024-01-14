@@ -3,7 +3,8 @@ from moviepy.editor import VideoFileClip
 import cv2
 import os
 import numpy as np
-import imageio
+
+import time
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
@@ -365,13 +366,6 @@ def convertir_a_mp4(input_path, output_path):
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
     try:
-        # Verificar si el archivo existe y eliminarlo
-        if os.path.exists('./static/output_folder/output_video_conver.mp4'):
-            os.remove('./static/output_folder/output_video_conver.mp4')
-    except Exception as e:
-        print(f"Error al eliminar el archivo temporal: {str(e)}")
-        
-    try:
         
         # Verificar si se ha enviado un archivo
         if 'videoFile' not in request.files:
@@ -394,9 +388,8 @@ def upload_video():
          # Devolver la URL del video procesado al front-end
         convertir_a_mp4(video_input,video_output)
         video_url = './static/output_folder/output_video_conver.mp4'
-        
-        return render_template('upload.html', video_url=video_url)
-
+        random_parameter = int(time.time())
+        return render_template('upload.html', video_url=video_url, random_parameter=random_parameter)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
