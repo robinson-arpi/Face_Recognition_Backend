@@ -52,8 +52,13 @@ footer {
 .content {
   flex: 1; /* Hacer que el contenedor principal ocupe todo el espacio disponible */
   height: 85vh;  /* Establecer la altura del cuerpo como el 80% del viewport height */
+  justify-content: center;
+  align-items: center;
 }
 
+.row {
+  justify-content: center;
+}
 /* Estilos para la barra de navegación */
 .navbar-custom {
   background: var(--color-primario) !important;
@@ -71,4 +76,34 @@ footer {
   background: var(--color-terciario) !important;
   border-color: var(--color-primario) !important; /* Change this to the desired shade of blue */
   box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
+}
+
+.card-custom-video {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  height: 600px;
+  width: 680px;
+  text-align: center; /* Centro horizontalmente */
+}
+
+.card-custom-video:hover {
+  background: var(--color-terciario) !important;
+  border-color: var(--color-primario) !important; /* Change this to the desired shade of blue */
+  box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
+}
+
+
+#videoName {
+  width: 95%;
+  position: absolute; /* Añade posición absoluta */
+  bottom: 10px; /* Ajusta la posición desde la parte inferior según tus necesidades */
+  z-index: 1; /* Añade un z-index mayor que el de los elementos en el fondo */
+}
+#recordButton,
+#stopRecordButton {
+  margin: auto; /* Centro verticalmente */
+}
+.margin-left-custom {
+  margin-left: -500px; /* Ajusta este valor para mover el botón a la izquierda según tus preferencias */
+  margin-top: -50px;
 }

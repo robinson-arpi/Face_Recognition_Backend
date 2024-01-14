@@ -23,15 +23,17 @@
         </div>    
     </form>
 
-    {% if video_url %}
-    <div class="mt-3">
-        <p>Processed Video:</p>
-        <video width="100%" controls>
-            <source src="{{ video_url }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <div class="mt-3" id="video-container">
+        {% if video_url %}
+
+            <p>Processed Video:</p>
+            <video width="100%" controls>
+                <source src="{{ video_url }}?{{ random_parameter }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        
+        {% endif %}
     </div>
-    {% endif %}
 
 </div>
 
@@ -50,5 +52,6 @@
             }, false);
         });
     })();
+
 </script>
 {% endblock %}
