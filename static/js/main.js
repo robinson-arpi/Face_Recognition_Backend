@@ -1,6 +1,7 @@
 // main.js
 
 document.addEventListener('DOMContentLoaded', function () {
+
     // Obtener los elementos de los cards
     const trainingCard = document.getElementById('trainingCard');
     const uploadCard = document.getElementById('uploadCard');
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     home.addEventListener('click', function () {
         redirectToPage('');
     });
-
+    
     trainingCard.addEventListener('click', function () {
         redirectToPage('training');
     });
@@ -33,4 +34,5 @@ document.addEventListener('DOMContentLoaded', function () {
     personRealtimeCard.addEventListener('click', function () {
         redirectToPage('realtime_person');
     });
+    
 });

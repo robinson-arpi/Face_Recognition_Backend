@@ -3,6 +3,7 @@ from moviepy.editor import VideoFileClip
 import cv2
 import os
 import numpy as np
+import imageio
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
@@ -353,9 +354,25 @@ def training():
     return render_template('training.html')
 
 
+def convertir_a_mp4(input_path, output_path):
+    # Cargar el video desde el archivo de entrada
+    video = VideoFileClip(input_path)
+
+    # Guardar el video en formato MP4 en el archivo de salida
+    video.write_videofile(output_path, codec='libx264', audio_codec='aac')
+
+
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
     try:
+        # Verificar si el archivo existe y eliminarlo
+        if os.path.exists('./static/output_folder/output_video_conver.mp4'):
+            os.remove('./static/output_folder/output_video_conver.mp4')
+    except Exception as e:
+        print(f"Error al eliminar el archivo temporal: {str(e)}")
+        
+    try:
+        
         # Verificar si se ha enviado un archivo
         if 'videoFile' not in request.files:
             return jsonify({'error': 'No se envió ningún archivo de video'}), 400
@@ -371,14 +388,18 @@ def upload_video():
         video_file.save(temp_video_path)
 
         # Llamar a la función para reconocer caras en el video
-        recognize_faces_in_video(temp_video_path, 'modeloEigenFaceRecognizer.xml', 'output_folder', 'output_faces_folder')
-
+        recognize_faces_in_video(temp_video_path, 'modeloEigenFaceRecognizer.xml', './static/output_folder', 'output_faces_folder')
+        video_input = './static/output_folder/output_video.mp4'
+        video_output = './static/output_folder/output_video_conver.mp4'
          # Devolver la URL del video procesado al front-end
-        video_url = '/static/output_folder/output_video.mp4'
+        convertir_a_mp4(video_input,video_output)
+        video_url = './static/output_folder/output_video_conver.mp4'
+        
         return render_template('upload.html', video_url=video_url)
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
