@@ -18,7 +18,7 @@
         </div>    
         <div class="row">
             <div class="col-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary button-custom" onclick="uploadVideo()">Upload Video</button>
+                <button type="submit" class="btn btn-primary button-custom">Upload Video</button>
             </div>
         </div>    
     </form>
@@ -28,7 +28,7 @@
 
             <p>Processed Video:</p>
             <video width="100%" controls>
-                <source src="{{ video_url }}" type="video/mp4">
+                <source src="{{ video_url }}?{{ random_parameter }}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         
@@ -53,29 +53,5 @@
         });
     })();
 
-    function uploadVideo() {
-    // Obtener el contenedor del video
-    var videoContainer = document.getElementById('video-container');
-
-    // Crear un nuevo div para reemplazar el existente
-    var nuevoDiv = document.createElement('div');
-    nuevoDiv.setAttribute('class', 'mt-3');
-    nuevoDiv.setAttribute('id', 'video-container');
-
-    // Agregar el nuevo div al mismo lugar que el original
-    videoContainer.parentNode.replaceChild(nuevoDiv, videoContainer);
-
-    // Agregar un parámetro aleatorio a la URL del video para evitar la caché
-    var videoPlayer = document.createElement('video');
-    videoPlayer.width = "100%";
-    videoPlayer.controls = true;
-    var source = document.createElement('source');
-    source.src = "{{ video_url }}" + "?v=" + Math.random(); // Agregar un parámetro aleatorio
-    source.type = "video/mp4";
-    videoPlayer.appendChild(source);
-
-    // Añadir el nuevo reproductor de video al nuevo div
-    nuevoDiv.appendChild(videoPlayer);
-}
 </script>
 {% endblock %}

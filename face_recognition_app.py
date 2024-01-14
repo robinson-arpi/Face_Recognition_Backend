@@ -3,7 +3,8 @@ from moviepy.editor import VideoFileClip
 import cv2
 import os
 import numpy as np
-import imageio
+
+import time
 
 app = Flask(__name__)
 cap = cv2.VideoCapture(0)
@@ -308,64 +309,52 @@ def realtime_person():
     # Agrega la lógica que deseas ejecutar para la página en tiempo real
     return render_template("personRealTime.html")
 
+def get_video_size(file_path):
+    # Devuelve el tamaño del archivo de video en bytes
+    return os.path.getsize(file_path)
+
 @app.route('/training', methods=['GET', 'POST'])
 def training():
     if request.method == 'POST':
         try:
-            print("antes d eif")
-            if 'webcamVideo' in request.files:
-                print("En if")
-                file = request.files['webcamVideo']
-                file.save("Leggooo.webm")
-                return "Video subido con éxito."
-                
-            return "Error al subir el video."
-            # Verificar si se ha enviado un archivo
-            if 'videoFile' not in request.files:
-                return jsonify({'error': 'No se envió ningún archivo de video'}), 400
-
-            video_file = None
-            temp_video_path = ""
             try:
-                video_name = request.form.get('videoName')
-                video_file = request.files['videoFile']
-
-                # Guarda el video webm temporalmente
-                temp_path = f'temporal\\temp_{video_name}.webm'
-                video_file.save(temp_path)
-                # Convierte el video webm a mp4
-                temp_video_path = 'training_videos\\' + video_name + '.mp4'
-                print(temp_video_path)
                 try:
-                    clip = VideoFileClip(temp_path)
-                    clip.write_videofile(temp_video_path, codec='libx264')
-                    clip.close()
-                    print("webcam")
-                except Exception as e:
-                    print(e)    
-            except Exception as e:
-                print("Entra a upload")
-                video_file = request.files['videoFile']
-                video_name = video_file.filename
-                # Guardar el archivo de video en una ruta temporal
-                temp_video_path = 'training_videos\\' + video_name
+                    #Webcam
+                    if 'webcamVideo' in request.files:
+                        video_file = request.files['webcamVideo']
+                        video_name = request.form.get('videoName')
+                    #Vidoe upload    
+                    else:
+                        video_file = request.files['videoFile']
+                        video_name = video_file.filename    
+                # Verificar si se ha enviado un archivo
+                except Exception as e:   
+                    return jsonify({'error': 'No se envió ningún archivo de video'}), 400
+        
+                
+                # Guardar el archivo de video en una ruta temporal                    
+                temp_video_path = 'training_videos\\' + video_name + '.mp4'
                 video_file.save(temp_video_path)
-                print("upload")
+                
+                # Extracción de rostro
+                new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
+                
+                # entrenamiento
+                train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')    
+                
+                return render_template('training.html', message='Agregado(a): ' + new_face, success=True)
+            
+            except Exception as e:   
+                return jsonify({'error': 'Error al subir el video de la webcam'}), 400
 
-
-
-            # Llamar a la función para reconocer caras en el video  
-            new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
-
-            # entrenamiento
-            train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')
-
-            return render_template('training.html', message='Agregado(a): ' + new_face, success=True)
         except Exception as e:
             print(e)
             return render_template('training.html', message=str(e), success=False)
 
     return render_template('training.html')
+
+
+
 
 
 def convertir_a_mp4(input_path, output_path):
@@ -378,13 +367,6 @@ def convertir_a_mp4(input_path, output_path):
 
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
-    try:
-        # Verificar si el archivo existe y eliminarlo
-        if os.path.exists('./static/output_folder/output_video_conver.mp4'):
-            os.remove('./static/output_folder/output_video_conver.mp4')
-    except Exception as e:
-        print(f"Error al eliminar el archivo temporal: {str(e)}")
-        
     try:
         
         # Verificar si se ha enviado un archivo
@@ -408,9 +390,8 @@ def upload_video():
          # Devolver la URL del video procesado al front-end
         convertir_a_mp4(video_input,video_output)
         video_url = './static/output_folder/output_video_conver.mp4'
-        
-        return render_template('upload.html', video_url=video_url)
-
+        random_parameter = int(time.time())
+        return render_template('upload.html', video_url=video_url, random_parameter=random_parameter)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
