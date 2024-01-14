@@ -303,6 +303,10 @@ def realtime_person():
     # Agrega la lógica que deseas ejecutar para la página en tiempo real
     return render_template("personRealTime.html")
 
+def get_video_size(file_path):
+    # Devuelve el tamaño del archivo de video en bytes
+    return os.path.getsize(file_path)
+
 @app.route('/training', methods=['GET', 'POST'])
 def training():
     if request.method == 'POST':
@@ -338,9 +342,6 @@ def training():
                 temp_video_path = 'training_videos\\' + video_name
                 video_file.save(temp_video_path)
                 print("upload")
-
-
-
             # Llamar a la función para reconocer caras en el video  
             new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
 
@@ -353,6 +354,9 @@ def training():
             return render_template('training.html', message=str(e), success=False)
 
     return render_template('training.html')
+
+
+
 
 
 def convertir_a_mp4(input_path, output_path):
