@@ -239,14 +239,15 @@ def recognize_faces_realtime(frame, labels_mapping):
 
             label, confidence = face_recognizer.predict(face_roi_resized)
             
-            # Modificación: Verificar confianza
-            if confidence < 80:  # Puedes ajustar el umbral de confianza según tus necesidades
+            # Modificación: Verificar confianza           
+            if confidence < 3500:  # Ajuste d eumbral de confianza
                 person_name = labels_mapping.get(label, f'Persona {label}')
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.putText(frame, person_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
             else:
                 person_name = 'Desconocido'
-
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            cv2.putText(frame, person_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                cv2.putText(frame, person_name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
         return frame
     except Exception as e:
