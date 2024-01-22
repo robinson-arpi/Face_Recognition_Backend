@@ -7,10 +7,10 @@
             <div class="mb-3">
                 <div class="card mb-3 card-custom">
                     <div class="card-body">
-                        <label for="videoFile" class="form-label">Select Video (.mp4)</label>
+                        <label for="videoFile" class="form-label">Seleccionar Vídeo (.mp4)</label>
                         <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4" required>
                         <div class="invalid-feedback">
-                            Please choose a valid .mp4 file.
+                            Por favor seleccione un archivo .mp4 válido.
                         </div>
                     </div>
                 </div>
@@ -18,7 +18,7 @@
         </div>    
         <div class="row">
             <div class="col-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary button-custom">Upload Video</button>
+                <button type="submit" class="btn btn-primary button-custom">Subir Vídeo</button>
             </div>
         </div>    
     </form>
@@ -26,10 +26,10 @@
     <div class="mt-3" id="video-container">
         {% if video_url %}
 
-            <p>Processed Video:</p>
+            <p>Vídeo procesado:</p>
             <video width="100%" controls>
                 <source src="{{ video_url }}?{{ random_parameter }}" type="video/mp4">
-                Your browser does not support the video tag.
+                Su navegator no admite etiquetas de vídeo. 
             </video>
         
         {% endif %}
