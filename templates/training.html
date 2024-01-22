@@ -2,104 +2,276 @@
 
 {% block content %}
 <div class="container mt-5">
+
+    <div class="text-center">
+        <label class="form-label">Selecciona un vídeo (.mp4) o graba un vídeo usando cámara web</label>
+    </div> 
+
     <form action="/training" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-        <label for="videoFile" class="form-label">Select Video (.mp4) or Record from Webcam</label>
+
+        <!-- Seleccionar vídeo o grabar -->
         <div class="row">
+            <!-- Subir vídeo -->
             <div class="col-md-6">
-                <div class="card mb-3 card-custom">
+                <div class="card">
                     <div class="card-body">
-                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4">
-                        <div class="invalid-feedback">
-                            Please choose a valid .mp4 file.
+                        <h5 class="card-title">Subir Vídeo</h5>
+                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept=".mp4" onchange="showVideoPreview(this)">
+                    </div>
+                </div>
+            </div>
+            <!-- Grabar vídeo -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Grabar Vídeo</h5>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#recordModal">Grabar desde la cámara web</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mostrar vídeo -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Previsualización</h5>
+                        <div class="d-flex justify-content-center">
+                            <video id="videoPreview" controls style="display: none; width: 40%;"></video>
                         </div>
                     </div>
                 </div>
             </div>
-            
+        </div>
+
+        <div class="row mt-2">
+            <!-- Subir vídeo -->
             <div class="col-md-6">
-                <div class="card mb-3 card-custom-video">
+                <div class="card border-0">
                     <div class="card-body">
-                        <button type="button" class="btn btn-secondary" id="recordButton">Record from Webcam</button>
-                        <video id="liveVideo" style="display: none;" autoplay></video>
-                        <input type="file" class="form-control mt-2" id="webcamVideo" name="webcamVideo" accept="video/*" style="display: none;">
-                        <video id="recordedVideo" style="display: none;" controls></video>
-                        <input type="text" class="form-control mt-2" id="videoName" name="videoName" placeholder="Enter a name for person">
-                        <button type="button" class="btn btn-danger mt-2" id="stopRecordButton" style="display: none;">Stop Recording</button>
+                        <input type="text" class="form-control mt-2" id="recordedVideoName" name="recordedVideoName" placeholder="Nombre de la persona">
+                    </div>
+                </div>
+            </div>
+            <!-- Grabar vídeo -->
+            <div class="col-md-6">
+                <div class="card border-0">
+                    <div class="card-body">
+                        
+                        <button type="submit" class="btn btn-primary button-custom mt-2">Entrenar con este vídeo</button>
+                        <button id="inicio" class="btn btn-primary button-custom mt-2">Cancelar/Volver a inicio</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary button-custom margin-left-custom">Upload Video and Train</button>
-            </div>
-        </div>
+
     </form>
 
-    {% if message %}
-        <div class="mt-3 alert alert-{{ 'success' if success else 'danger' }}" role="alert">
-            {{ message }}
+    <!-- Ventana modal para grabación -->
+    <div class="modal fade" id="recordModal" tabindex="-1" aria-labelledby="recordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recordModalLabel">Grabar vídeo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <video id="liveVideo" autoplay style="transform: scaleX(-1); width: 80%;"></video>
+                        <div id="recordingTimer" style="text-align: center; display: none;">00:00</div>
+                    </div> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="startRecordButton">Grabar</button>
+                </div>
+            </div>
         </div>
-    {% endif %}
+    </div>
+
+    <!-- Modal para mostrar mientras se entrena la red -->
+    <div class="modal" tabindex="-1" id="loadingModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <p>Entrenando la red...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar la respuesta del servidor -->
+    <div class="modal fade" id="responseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="Mensaje"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const recordButton = document.getElementById('recordButton');
-    const stopRecordButton = document.getElementById('stopRecordButton');
-    const liveVideo = document.getElementById('liveVideo');
-    const videoNameInput = document.getElementById('videoName');
-    const webcamVideoInput = document.getElementById('webcamVideo');
-    let mediaRecorder;
-    let mediaStream;
+    document.addEventListener('DOMContentLoaded', function() {
+        const startRecordButton = document.getElementById('startRecordButton');
+        const liveVideo = document.getElementById('liveVideo');
+        const videoPreview = document.getElementById('videoPreview');
+        let mediaRecorder;
+        let mediaStream;
+        let videoBlob;
+        const homeButton = document.getElementById('inicio');
 
-    recordButton.addEventListener('click', startRecording);
-    stopRecordButton.addEventListener('click', stopRecording);
+        // Evento para redirigir a la página de inicio
+        homeButton.addEventListener('click', function() {
+            window.location.href = '/';
+        });
 
-    async function startRecording() {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        liveVideo.srcObject = mediaStream;
-        liveVideo.style.display = 'block';
 
-        mediaRecorder = new MediaRecorder(mediaStream);
-        let chunks = [];
-        mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-                chunks.push(event.data);
-            }
-        };
-
-        function createFileList(file) {
-            const fileList = new DataTransfer();
-            fileList.items.add(file);
-            return fileList.files;
-        }
-        
-        mediaRecorder.onstop = () => {
+        // Muestra previsualización de la cámara cuando se abre la ventana modal
+        $('#recordModal').on('show.bs.modal', async function() {
             try {
-                const blob = new Blob(chunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                liveVideo.src = url;
-                // Utiliza la función createFileList para asignar el FileList al atributo files del input
-                webcamVideoInput.files = createFileList(new File([blob], 'webcam-video.mp4', { type: 'video/mp4' }));
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                liveVideo.srcObject = mediaStream;
             } catch (error) {
-                console.error('Error stopVideo:', error);
+                console.error('Error al abrir la cámara:', error);
             }
-        };
-        
-        mediaRecorder.start();
-        chunks = [];
-        recordButton.style.display = 'none';
-        stopRecordButton.style.display = 'block';
-    }
+        });
+    
+        // Detener previsualización de la cámara cuando se cierra la ventana modal
+        $('#recordModal').on('hidden.bs.modal', function() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                liveVideo.srcObject = null;
+            }
+        });
+    
+        let recording = false;
+        let recordingTimerInterval = null;
+        let startTime = null;
+    
+        startRecordButton.addEventListener('click', function() {
+            if (!recording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+    
+        function startRecording() {
+            mediaRecorder = new MediaRecorder(mediaStream);
+            let chunks = [];
+    
+            mediaRecorder.ondataavailable = event => chunks.push(event.data);
+    
+            mediaRecorder.onstop = () => {
+                videoBlob = new Blob(chunks, { type: 'video/mp4' });
+                const url = URL.createObjectURL(videoBlob);
+                videoPreview.src = url;
+                videoPreview.style.display = 'block';
+            };
+    
+            mediaRecorder.start();
+            recording = true;
+            startRecordButton.textContent = 'Parar y Guardar';
+            startTimer();
+        }
+    
+        function stopRecording() {
+            mediaRecorder.stop();
+            recording = false;
+            startRecordButton.textContent = 'Grabar';
+            stopTimer();
+            $('#recordModal').modal('hide');
+        }
+    
+        // Temporizador
+        function startTimer() {
+            startTime = Date.now();
+            recordingTimerInterval = setInterval(updateTimer, 1000);
+            document.getElementById('recordingTimer').style.display = 'block';
+        }
+    
+        function stopTimer() {
+            clearInterval(recordingTimerInterval);
+            document.getElementById('recordingTimer').style.display = 'none';
+        }
+    
+        function updateTimer() {
+            const elapsedTime = Date.now() - startTime;
+            const seconds = Math.floor((elapsedTime / 1000) % 60);
+            const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+            document.getElementById('recordingTimer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+    
+        // submit
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const videoFile = document.getElementById('videoFile').files[0];
+            const videoName = document.getElementById('recordedVideoName').value;
+    
+            if ((!videoFile && !videoBlob) || !videoName) {
+                // Mostrar la respuesta del servidor en el modal de respuesta
+                document.getElementById('Mensaje').textContent = 'Por favor, asegúrate de que has seleccionado un vídeo y has ingresado un nombre.';
+                $('#responseModal').modal('show');
+                return;
+            }
+    
+            const formData = new FormData();
+            if (videoBlob) {
+                formData.append('webcamVideo', videoBlob, 'webcamVideo.mp4');
+            } else {
+                formData.append('videoFile', videoFile);
+            }
+            formData.append('videoName', videoName);
 
-    function stopRecording() {
-        mediaRecorder.stop();
-        mediaStream.getTracks().forEach(track => track.stop());
-        stopRecordButton.style.display = 'none';
-        recordButton.style.display = 'block';
-    }
-});
+            // Muestra el modal
+            $('#loadingModal').modal('show');
+    
+            fetch('/training', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                //console.log(data); // Manejar la respuesta del servidor
+                $('#loadingModal').modal('hide');
+                
+                // Limpiar todos los campos
+                document.getElementById('videoFile').value = '';
+                document.getElementById('recordedVideoName').value = '';
+                videoPreview.style.display = 'none';
 
-</script>
+                // Mostrar la respuesta del servidor en el modal de respuesta
+                document.getElementById('Mensaje').textContent = data.message;
+                $('#responseModal').modal('show');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+    
+    function showVideoPreview(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                videoPreview.src = e.target.result;
+                videoPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>    
+
 {% endblock %}

@@ -317,45 +317,36 @@ def get_video_size(file_path):
 def training():
     if request.method == 'POST':
         try:
-            try:
-                try:
-                    #Webcam
-                    if 'webcamVideo' in request.files:
-                        video_file = request.files['webcamVideo']
-                        video_name = request.form.get('videoName')
-                    #Vidoe upload    
-                    else:
-                        video_file = request.files['videoFile']
-                        video_name = video_file.filename    
-                # Verificar si se ha enviado un archivo
-                except Exception as e:   
-                    return jsonify({'error': 'No se envió ningún archivo de video'}), 400
-        
-                
-                # Guardar el archivo de video en una ruta temporal                    
-                temp_video_path = 'training_videos\\' + video_name + '.mp4'
-                video_file.save(temp_video_path)
-                
-                # Extracción de rostro
-                new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
-                
-                # entrenamiento
-                train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')    
-                
-                return render_template('training.html', message='Agregado(a): ' + new_face, success=True)
+            # Obtener el nombre de la persona del formulario
+            video_name = request.form.get('videoName')
+
+            # Determinar si el vídeo proviene de la webcam o es una carga de archivo
+            if 'webcamVideo' in request.files:
+                video_file = request.files['webcamVideo']
+            elif 'videoFile' in request.files:
+                video_file = request.files['videoFile']
+            else:
+                return jsonify({'message': 'No se envió ningún archivo de video'}), 400
+
+            # Verificar si se ha recibido un nombre
+            if not video_name:
+                return jsonify({'message': 'No se proporcionó un nombre para la persona'}), 400
+
+            # Guardar el archivo de video en una ruta temporal                    
+            temp_video_path = 'training_videos\\' + video_name + '.mp4'
+            video_file.save(temp_video_path)
             
-            except Exception as e:   
-                return jsonify({'error': 'Error al subir el video de la webcam'}), 400
-
+            # Extracción de rostro y entrenamiento
+            new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
+            train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')    
+            
+            return jsonify({'message': f'Agregado(a): {new_face}'})
+        
         except Exception as e:
-            print(e)
-            return render_template('training.html', message=str(e), success=False)
+            return jsonify({'message': str(e)}), 400
 
-    return render_template('training.html')
-
-
-
-
+    elif request.method == 'GET':
+        return render_template('training.html')
 
 def convertir_a_mp4(input_path, output_path):
     # Cargar el video desde el archivo de entrada

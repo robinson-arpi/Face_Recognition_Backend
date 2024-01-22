@@ -1,10 +1,10 @@
 import cv2
 import os
 import numpy as np
-#import imutils
-#from imutils import non_max_suppression
+import imutils
+from imutils import non_max_suppression
 
-def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=50):
+def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=300):
     try:
         video_capture = cv2.VideoCapture(video_path)
         face_cascade = cv2.CascadeClassifier(face_cascade_path)
