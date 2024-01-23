@@ -69,13 +69,15 @@ footer {
 .button-custom{
   background: var(--color-primario) !important;
   border-color: var(--color-primario) !important; /* Change this to the desired shade of blue */
-
+  margin-right: 8px;
+  margin-left: 8px;
 }
 
 .button-custom:hover{
   background: var(--color-terciario) !important;
   border-color: var(--color-primario) !important; /* Change this to the desired shade of blue */
   box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
+
 }
 
 .card-custom-video {
@@ -92,7 +94,6 @@ footer {
   box-shadow: 0 4px 8px var(--color-terciario); /* Cambia la sombra al hacer hover */
 }
 
-
 #videoName {
   width: 95%;
   position: absolute; /* Añade posición absoluta */
@@ -106,4 +107,8 @@ footer {
 .margin-left-custom {
   margin-left: -500px; /* Ajusta este valor para mover el botón a la izquierda según tus preferencias */
   margin-top: -50px;
+}
+
+.card-2 {
+  height: auto;
 }

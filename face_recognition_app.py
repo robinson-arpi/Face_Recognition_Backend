@@ -381,8 +381,8 @@ def upload_video():
          # Devolver la URL del video procesado al front-end
         convertir_a_mp4(video_input,video_output)
         video_url = './static/output_folder/output_video_conver.mp4'
-        random_parameter = int(time.time())
-        return render_template('upload.html', video_url=video_url, random_parameter=random_parameter)
+        #random_parameter = int(time.time())
+        return jsonify({'video_url': video_url})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
