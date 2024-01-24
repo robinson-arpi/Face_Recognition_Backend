@@ -80,7 +80,7 @@ def person_recognition_model():
                 bytearray(encodedImage) + b'\r\n')
     video.release()
 
-def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=50):
+def extract_faces_from_video(video_path, output_folder, face_cascade_path, max_captures=300):
     try:
         video_capture = cv2.VideoCapture(video_path)
         face_cascade = cv2.CascadeClassifier(face_cascade_path)
@@ -337,7 +337,7 @@ def training():
             video_file.save(temp_video_path)
             
             # Extracción de rostro y entrenamiento
-            new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=50)
+            new_face = extract_faces_from_video(temp_video_path, 'output_faces_folder', 'haarcascade_frontalface_default.xml', max_captures=300)
             train_face_recognizer('output_faces_folder', 'modeloEigenFaceRecognizer.xml')    
             
             return jsonify({'message': f'Agregado(a): {new_face}'})
